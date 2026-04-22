@@ -74,7 +74,7 @@ pipeline {
             steps {
                 bat 'flutter clean'
                 bat 'flutter pub get'
-                bat "flutter build apk --release"
+                bat "flutter build apk --${params.BUILD_TYPE}"
                 bat 'dir build\\app\\outputs /s'
             }
         }

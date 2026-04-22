@@ -75,7 +75,7 @@ pipeline {
                 bat """
                 flutter pub get
                 flutter build apk --${params.BUILD_TYPE}
-                dir build\\app\\outputs\\flutter-apk
+                dir build\\app\\outputs /s
                 """
             }
         }
@@ -84,7 +84,7 @@ pipeline {
         stage('SAST - Static Analysis (MobSF)') {
             steps {
                 script {
-                    def apkPath = "build/app/outputs/flutter-apk/app-${params.BUILD_TYPE}.apk"
+                    def apkPath = "build/app/outputs/apk/${params.BUILD_TYPE}/app-${params.BUILD_TYPE}.apk"
                     if (!fileExists(apkPath)) {
                         error "APK not found: ${apkPath}"
                     }

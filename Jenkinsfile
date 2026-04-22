@@ -72,11 +72,10 @@ pipeline {
         // ================= BUILD APK =================
         stage('Build APK') {
             steps {
-                bat """
-                flutter pub get
-                flutter build apk --${params.BUILD_TYPE}
-                dir build\\app\\outputs /s
-                """
+                bat 'flutter clean'
+                bat 'flutter pub get'
+                bat "flutter build apk --release"
+                bat 'dir build\\app\\outputs /s'
             }
         }
 

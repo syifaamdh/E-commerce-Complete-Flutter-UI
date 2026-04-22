@@ -20,10 +20,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Shop Template by The Flutter Way',
       theme: AppTheme.lightTheme(context),
-      // Dark theme is inclided in the Full template
       themeMode: ThemeMode.light,
       onGenerateRoute: router.generateRoute,
-      initialRoute: onbordingScreenRoute,
+      initialRoute: entryPointScreenRoute,
     );
   }
 }

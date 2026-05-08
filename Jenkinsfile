@@ -28,18 +28,17 @@ pipeline {
     }
 
     environment {
-        ANDROID_HOME     = "C:\\Users\\Lenovo\\AppData\\Local\\Android\\Sdk"
+        ANDROID_HOME     = "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk"
         ANDROID_SDK_ROOT = "${ANDROID_HOME}"
         FLUTTER_HOME     = "D:\\flutter"
         JAVA_HOME        = "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.17.10-hotspot"
 
-        PATH = "${FLUTTER_HOME}\\bin;${JAVA_HOME}\\bin;${ANDROID_HOME}\\platform-tools;${ANDROID_HOME}\\emulator;${env.PATH}"
-
+        PATH = "${FLUTTER_HOME}\\bin;${JAVA_HOME}\\bin;${ANDROID_HOME}\\platform-tools;${ANDROID_HOME}\\emulator;${ANDROID_HOME}\\cmdline-tools\\latest\\bin;${env.PATH}"
         AVD_NAME    = "Pixel_4_XL"
         APP_PACKAGE = "com.example.shop"
 
         MOBSF_URL   = "http://localhost:8000"
-        MOBSF_TOKEN = "8e2a73a972044f782981594b2eefdf86e13e08745853097432943c9bcccd2a52"
+        MOBSF_TOKEN = "68f94303e8c795a5a7680850a034e78ccdb27cbabe84bd7af34e029c09be9057"
     }
 
     stages {
@@ -63,7 +62,17 @@ pipeline {
             steps {
                 bat """
                 git config --global --add safe.directory "%WORKSPACE%"
+
+                set ANDROID_HOME=${env.ANDROID_HOME}
+                set ANDROID_SDK_ROOT=${env.ANDROID_HOME}
+
+                set PATH=%PATH%;${env.ANDROID_HOME}\\platform-tools
+                set PATH=%PATH%;${env.ANDROID_HOME}\\cmdline-tools\\latest\\bin
+                set PATH=%PATH%;${env.ANDROID_HOME}\\emulator
+
+                flutter config --android-sdk "${env.ANDROID_HOME}"
                 flutter config --jdk-dir "${env.JAVA_HOME}"
+
                 flutter doctor -v
                 """
             }
@@ -74,13 +83,19 @@ pipeline {
             steps {
                 bat 'flutter clean'
                 bat 'flutter pub get'
+
+                bat 'dir "%ANDROID_HOME%"'
+                bat 'dir "%ANDROID_HOME%\\platform-tools"'
+                bat 'sdkmanager --list'
+
                 bat "flutter build apk --${params.BUILD_TYPE}"
+
                 bat 'dir build\\app\\outputs /s'
             }
         }
 
         // ================= SAST =================
-        stage('SAST - Static Analysis (MobSF)') {
+        stage('SAST - Static Analysis ') {
             steps {
                 script {
                     def apkPath = "build/app/outputs/apk/${params.BUILD_TYPE}/app-${params.BUILD_TYPE}.apk"

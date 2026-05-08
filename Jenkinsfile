@@ -67,7 +67,6 @@ pipeline {
                 set ANDROID_SDK_ROOT=${env.ANDROID_HOME}
 
                 set PATH=%PATH%;${env.ANDROID_HOME}\\platform-tools
-                set PATH=%PATH%;${env.ANDROID_HOME}\\cmdline-tools\\latest\\bin
                 set PATH=%PATH%;${env.ANDROID_HOME}\\emulator
 
                 flutter config --android-sdk "${env.ANDROID_HOME}"

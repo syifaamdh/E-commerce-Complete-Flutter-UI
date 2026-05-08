@@ -117,9 +117,9 @@ pipeline {
             steps {
                 script {
                     def sourcePath = "build\\app\\outputs\\flutter-apk\\app-${params.BUILD_TYPE}.apk"
-                    if (!fileExists(apkPath)) {
-                        error "APK not found: ${apkPath}"
-                    }
+                        if (!fileExists(sourcePath)) {
+                            error "APK not found: ${sourcePath}"
+                        }
 
                     echo "Uploading APK to MobSF (SAST)..."
 
@@ -127,7 +127,7 @@ pipeline {
                         script: """
                         @curl -s ^
                         -H "Authorization: ${env.MOBSF_TOKEN}" ^
-                        -F "file=@${apkPath}" ^
+                        -F "file=@${sourcePath}" ^
                         ${env.MOBSF_URL}/api/v1/upload
                         """,
                         returnStdout: true

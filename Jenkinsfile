@@ -89,16 +89,25 @@ pipeline {
                 set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.19.10-hotspot
                 set PATH=%JAVA_HOME%\\bin;%PATH%
 
+                echo ================= JAVA =================
                 echo JAVA_HOME=%JAVA_HOME%
                 java -version
                 where java
 
+                echo ================= FLUTTER =================
+                flutter doctor -v
+
+                echo ================= CLEAN =================
                 flutter clean
+
+                echo ================= PUB GET =================
                 flutter pub get
 
-                sdkmanager --list
+                echo ================= BUILD APK =================
+                flutter build apk --%BUILD_TYPE% --verbose
 
-                flutter build apk --%BUILD_TYPE%
+                echo ================= APK OUTPUT =================
+                dir build\\app\\outputs /s
                 '''
             }
         }

@@ -85,16 +85,21 @@ pipeline {
         // ================= BUILD APK =================
         stage('Build APK') {
             steps {
-                bat 'flutter clean'
-                bat 'flutter pub get'
+                bat '''
+                set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.19.10-hotspot
+                set PATH=%JAVA_HOME%\\bin;%PATH%
 
-                bat 'dir "%ANDROID_HOME%"'
-                bat 'dir "%ANDROID_HOME%\\platform-tools"'
-                bat 'sdkmanager --list'
+                echo JAVA_HOME=%JAVA_HOME%
+                java -version
+                where java
 
-                bat "flutter build apk --${params.BUILD_TYPE}"
+                flutter clean
+                flutter pub get
 
-                bat 'dir build\\app\\outputs /s'
+                sdkmanager --list
+
+                flutter build apk --%BUILD_TYPE%
+                '''
             }
         }
 

@@ -68,10 +68,12 @@ pipeline {
 
                 set PATH=%PATH%;${env.ANDROID_HOME}\\platform-tools
                 set PATH=%PATH%;${env.ANDROID_HOME}\\emulator
+                set PATH=%PATH%;${env.ANDROID_HOME}\\cmdline-tools\\latest\\bin
 
                 flutter config --android-sdk "${env.ANDROID_HOME}"
                 flutter config --jdk-dir "${env.JAVA_HOME}"
 
+                sdkmanager --licenses
                 flutter doctor -v
                 """
             }

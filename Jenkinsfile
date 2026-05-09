@@ -80,8 +80,8 @@ pipeline {
         // ================= BUILD APK =================
         stage('Build APK') {
             steps {
-                bat """
-                set JAVA_HOME=${env.JAVA_HOME}
+                bat '''
+                set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.19.10-hotspot
                 set PATH=%JAVA_HOME%\\bin;%PATH%
 
                 echo ================= JAVA =================
@@ -94,11 +94,11 @@ pipeline {
                 flutter pub get
 
                 echo ================= BUILD APK =================
-                flutter build apk --debug
+                flutter build apk --debug --verbose
 
                 echo ================= APK CHECK =================
                 dir build\\app\\outputs\\flutter-apk /s
-                """
+                '''
             }
         }
 

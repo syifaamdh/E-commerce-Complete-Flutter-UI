@@ -271,9 +271,11 @@ stage('Download PDF Report') {
                 """
                 echo "Downloading DAST PDF (Custom)..."
                 bat """
-                @curl -L -f ^
-                ${env.MOBSF_URL}/dynamic_pdf/${env.APK_HASH}/ ^
-                --output dast_report.pdf --silent --show-error
+                @curl -s -X POST ^
+                -H "Authorization: ${env.MOBSF_TOKEN}" ^
+                --data "hash=${env.APK_HASH}" ^
+                ${env.MOBSF_URL}/api/v1/dynamic/report_json ^
+                -o dast_report.json
                 """
 
                 sleep 2
@@ -285,10 +287,7 @@ stage('Download PDF Report') {
             } else {
                 echo "APK_HASH not found."
             }
-            def size = bat(
-                script: '@for %%I in (dast_report.pdf) do @echo %%~zI',
-                returnStdout: true
-            ).trim().split("\\r?\\n")[-1]
+            
 
             if (size.toInteger() < 50000) {
                 error "DAST PDF INVALID: ${size} bytes"

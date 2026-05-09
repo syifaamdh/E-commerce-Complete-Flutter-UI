@@ -294,41 +294,57 @@ pipeline {
             }
         }
 
-stage('Send Email Manual') {
-    steps {
-        writeFile file: 'send_email.ps1', text: '''
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+    stage('Send Email Manual') {
+        steps {
+            writeFile file: 'send_email.ps1', text: '''
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-$smtpServer = "smtp.gmail.com"
-$smtpPort = 587
-$from = "syifaamaraqueen@gmail.com"
-$to = "ninis2405@gmail.com,syifaamdh@gmail.com"
-$password = "oykfwhosxxhgdhwo"
+    $smtpServer = "smtp.gmail.com"
+    $smtpPort = 587
 
-$mail = New-Object System.Net.Mail.MailMessage
-$mail.From = $from
-$mail.To.Add($to)
-$mail.Subject = "Security Report Jenkins"
-$mail.Body = "Laporan PDF terlampir"
+    $from = "syifaamaraqueen@gmail.com"
+    $password = "oykfwhosxxhgdhwo"
 
-$att1 = New-Object System.Net.Mail.Attachment("sast_report.pdf")
-$att2 = New-Object System.Net.Mail.Attachment("dast_report.pdf")
+    $mail = New-Object System.Net.Mail.MailMessage
+    $mail.From = $from
 
-$mail.Attachments.Add($att1)
-$mail.Attachments.Add($att2)
+    # MULTIPLE RECIPIENTS
+    $mail.To.Add("ninis2405@gmail.com")
+    $mail.To.Add("syifaamdh@gmail.com")
 
-$smtp = New-Object System.Net.Mail.SmtpClient($smtpServer, $smtpPort)
-$smtp.EnableSsl = $true
-$smtp.UseDefaultCredentials = $false
-$smtp.Credentials = New-Object System.Net.NetworkCredential($from, $password)
-$smtp.DeliveryMethod = [System.Net.Mail.SmtpDeliveryMethod]::Network
-$smtp.Timeout = 30000
+    $mail.Subject = "Security Report Jenkins"
+    $mail.Body = "Laporan security report terlampir."
 
-$smtp.Send($mail)
-'''
-        bat 'powershell -ExecutionPolicy Bypass -File send_email.ps1'
+    # ATTACHMENTS
+    if (Test-Path "sast_report.pdf") {
+        $att1 = New-Object System.Net.Mail.Attachment("sast_report.pdf")
+        $mail.Attachments.Add($att1)
     }
-}
+
+    if (Test-Path "dast_report.pdf") {
+        $att2 = New-Object System.Net.Mail.Attachment("dast_report.pdf")
+        $mail.Attachments.Add($att2)
+    }
+
+    $smtp = New-Object System.Net.Mail.SmtpClient($smtpServer, $smtpPort)
+    $smtp.EnableSsl = $true
+    $smtp.UseDefaultCredentials = $false
+    $smtp.Credentials = New-Object System.Net.NetworkCredential($from, $password)
+    $smtp.DeliveryMethod = [System.Net.Mail.SmtpDeliveryMethod]::Network
+    $smtp.Timeout = 30000
+
+    try {
+        $smtp.Send($mail)
+        Write-Host "EMAIL SUCCESS"
+    }
+    catch {
+        Write-Host $_.Exception.Message
+        exit 1
+    }
+    '''
+            bat 'powershell -ExecutionPolicy Bypass -File send_email.ps1'
+        }
+    }
     }
 
     post {

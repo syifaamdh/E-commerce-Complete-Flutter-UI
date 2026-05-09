@@ -106,6 +106,9 @@ pipeline {
                 echo ================= BUILD APK =================
                 flutter build apk --%BUILD_TYPE% --verbose
 
+                echo ================= CHECK APK =================
+                dir build\\app\\outputs\\flutter-apk /s 
+
                 echo ================= APK OUTPUT =================
                 dir build\\app\\outputs /s
                 '''

@@ -102,7 +102,14 @@ pipeline {
                 flutter build apk --debug --verbose
 
                 echo ================= CHECK APK =================
-                dir build\\app\\outputs\\flutter-apk /s 
+                dir build\\app\\outputs\\flutter-apk /s
+
+                if exist build\\app\\outputs\\flutter-apk\\app-debug.apk (
+                    echo APK FOUND
+                ) else (
+                    echo APK NOT FOUND
+                    exit /b 1
+                )
 
                 echo ================= APK OUTPUT =================
                 dir build\\app\\outputs /s

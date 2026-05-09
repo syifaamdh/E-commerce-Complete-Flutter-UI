@@ -302,8 +302,8 @@ stage('Send Email Manual') {
 $smtpServer = "smtp.gmail.com"
 $smtpPort = 587
 $from = "syifaamaraqueen@gmail.com"
-$to = "syifaamdh@gmail.com"
-$password = "lyftygsebuyndied"
+$to = "ninis2405@gmail.com,syifaamdh@gmail.com"
+$password = "oykfwhosxxhgdhwo"
 
 $mail = New-Object System.Net.Mail.MailMessage
 $mail.From = $from

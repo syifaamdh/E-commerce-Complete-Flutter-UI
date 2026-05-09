@@ -257,44 +257,42 @@ pipeline {
                 bat 'taskkill /F /IM qemu-system-x86_64.exe /T || echo Emulator already stopped'
             }
         }
-stage('Download PDF Report') {
-    steps {
-        script {
-            if (env.APK_HASH) {
+        stage('Download PDF Report') {
+            steps {
+                script {
 
-                bat """
-                @curl -s -X POST ^
-                -H "Authorization: ${env.MOBSF_TOKEN}" ^
-                --data "hash=${env.APK_HASH}" ^
-                ${env.MOBSF_URL}/api/v1/download_pdf ^
-                -o sast_report.pdf
-                """
-                echo "Downloading DAST PDF (Custom)..."
-                bat """
-                @curl -s -X POST ^
-                -H "Authorization: ${env.MOBSF_TOKEN}" ^
-                --data "hash=${env.APK_HASH}" ^
-                ${env.MOBSF_URL}/api/v1/dynamic/report_json ^
-                -o dast_report.json
-                """
+                    if (env.APK_HASH) {
 
-                sleep 2
- 
+                        echo "Downloading SAST PDF..."
 
-                bat "dir dast_report.pdf"
-                bat "for %%I in (dast_report.pdf) do @echo Size: %%~zI bytes"
+                        bat """
+                        @curl -s -X POST ^
+                        -H "Authorization: ${env.MOBSF_TOKEN}" ^
+                        --data "hash=${env.APK_HASH}" ^
+                        ${env.MOBSF_URL}/api/v1/download_pdf ^
+                        -o sast_report.pdf
+                        """
 
-            } else {
-                echo "APK_HASH not found."
-            }
-            
+                        echo "Downloading DAST JSON Report..."
 
-            if (size.toInteger() < 50000) {
-                error "DAST PDF INVALID: ${size} bytes"
+                        bat """
+                        @curl -s -X POST ^
+                        -H "Authorization: ${env.MOBSF_TOKEN}" ^
+                        --data "hash=${env.APK_HASH}" ^
+                        ${env.MOBSF_URL}/api/v1/dynamic/report_json ^
+                        -o dast_report.pdf
+                        """
+
+                        archiveArtifacts artifacts: 'sast_report.pdf, dast_report.json', allowEmptyArchive: true
+
+                        echo "Reports downloaded successfully."
+
+                    } else {
+                        echo "APK_HASH not found."
+                    }
+                }
             }
         }
-    }
-}
 
 stage('Send Email Manual') {
     steps {

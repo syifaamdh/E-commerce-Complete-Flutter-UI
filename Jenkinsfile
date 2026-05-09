@@ -68,15 +68,10 @@ pipeline {
                 set JAVA_HOME=${env.JAVA_HOME}
 
                 set PATH=%JAVA_HOME%\\bin;%PATH%
-                set PATH=%PATH%;${env.ANDROID_HOME}\\platform-tools
-                set PATH=%PATH%;${env.ANDROID_HOME}\\emulator
-                set PATH=%PATH%;${env.ANDROID_HOME}\\cmdline-tools\\latest\\bin
 
-                java -version
                 flutter config --android-sdk "${env.ANDROID_HOME}"
                 flutter config --jdk-dir "${env.JAVA_HOME}"
 
-                sdkmanager --licenses
                 flutter doctor -v
                 """
             }
@@ -104,7 +99,7 @@ pipeline {
                 flutter pub get
 
                 echo ================= BUILD APK =================
-                flutter build apk --%BUILD_TYPE% --verbose
+                flutter build apk --debug --verbose
 
                 echo ================= CHECK APK =================
                 dir build\\app\\outputs\\flutter-apk /s 

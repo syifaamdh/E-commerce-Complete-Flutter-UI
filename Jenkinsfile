@@ -257,7 +257,7 @@ pipeline {
                 bat 'taskkill /F /IM qemu-system-x86_64.exe /T || echo Emulator already stopped'
             }
         }
-        stage('Download PDF Report') {
+       stage('Download PDF Report') {
             steps {
                 script {
 
@@ -266,29 +266,35 @@ pipeline {
                         echo "Downloading SAST PDF..."
 
                         bat """
-                        @curl -s -X POST ^
+                        @curl -L -o sast_report.pdf ^
+                        -X POST ^
                         -H "Authorization: ${env.MOBSF_TOKEN}" ^
                         --data "hash=${env.APK_HASH}" ^
-                        ${env.MOBSF_URL}/api/v1/download_pdf ^
-                        -o sast_report.pdf
+                        ${env.MOBSF_URL}/api/v1/download_pdf
                         """
 
-                        echo "Downloading DAST JSON Report..."
+                        echo "Waiting MobSF generate DAST PDF..."
+                        sleep 15
+
+                        echo "Downloading DAST PDF..."
 
                         bat """
-                        @curl -s -X POST ^
-                        -H "Authorization: ${env.MOBSF_TOKEN}" ^
-                        --data "hash=${env.APK_HASH}" ^
-                        ${env.MOBSF_URL}/api/v1/dynamic/report_json ^
-                        -o dast_report.pdf
+                        @curl -L ^
+                        --output dast_report.pdf ^
+                        --silent --show-error ^
+                        ${env.MOBSF_URL}/dynamic_pdf/${env.APK_HASH}/
                         """
 
-                        archiveArtifacts artifacts: 'sast_report.pdf, dast_report.json', allowEmptyArchive: true
+                        sleep 3
 
-                        echo "Reports downloaded successfully."
+                        bat 'dir *.pdf'
+
+                        archiveArtifacts artifacts: '*.pdf', allowEmptyArchive: true
+
+                        echo "PDF reports downloaded successfully."
 
                     } else {
-                        echo "APK_HASH not found."
+                        error "APK_HASH not found."
                     }
                 }
             }
@@ -338,7 +344,14 @@ pipeline {
         Write-Host "EMAIL SUCCESS"
     }
     catch {
-        Write-Host $_.Exception.Message
+        Write-Host "ERROR FULL:"
+        Write-Host $_.Exception.ToString()
+
+        if ($_.Exception.InnerException) {
+            Write-Host "INNER:"
+            Write-Host $_.Exception.InnerException.ToString()
+        }
+
         exit 1
     }
     '''

@@ -80,40 +80,25 @@ pipeline {
         // ================= BUILD APK =================
         stage('Build APK') {
             steps {
-                bat '''
-                set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.19.10-hotspot
+                bat """
+                set JAVA_HOME=${env.JAVA_HOME}
                 set PATH=%JAVA_HOME%\\bin;%PATH%
 
                 echo ================= JAVA =================
-                echo JAVA_HOME=%JAVA_HOME%
                 java -version
-                where java
 
-                echo ================= FLUTTER =================
-                flutter doctor -v
-
-                echo ================= CLEAN =================
+                echo ================= FLUTTER CLEAN =================
                 flutter clean
 
                 echo ================= PUB GET =================
                 flutter pub get
 
                 echo ================= BUILD APK =================
-                flutter build apk --debug --verbose
+                flutter build apk --debug
 
-                echo ================= CHECK APK =================
+                echo ================= APK CHECK =================
                 dir build\\app\\outputs\\flutter-apk /s
-
-                if exist build\\app\\outputs\\flutter-apk\\app-debug.apk (
-                    echo APK FOUND
-                ) else (
-                    echo APK NOT FOUND
-                    exit /b 1
-                )
-
-                echo ================= APK OUTPUT =================
-                dir build\\app\\outputs /s
-                '''
+                """
             }
         }
 
